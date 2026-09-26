@@ -1,0 +1,18 @@
+{
+  "name": "@eitri/types",
+  "version": "0.0.0",
+  "private": true,
+  "types": "./src/index.ts",
+  "exports": {
+    ".": {
+      "types": "./src/index.ts"
+    }
+  },
+  "scripts": {
+    "typecheck": "tsc --project tsconfig.json"
+  },
+  "devDependencies": {
+    "@eitri/config": "workspace:*",
+    "typescript": "^5.5.0"
+  }
+}
