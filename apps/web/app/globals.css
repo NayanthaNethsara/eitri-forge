@@ -4,16 +4,48 @@
 
 :root {
   color-scheme: dark;
-  --background: 226 31% 7%;
-  --foreground: 220 25% 93%;
-  --surface: 226 24% 12%;
-  --muted: 222 14% 63%;
-  --accent: 189 88% 60%;
-  --success: 150 62% 52%;
-  --destructive: 0 78% 65%;
+  --background: 232 28% 7%;
+  --foreground: 225 25% 96%;
+  --surface: 232 23% 11%;
+  --subtle: 231 20% 17%;
+  --muted: 225 11% 64%;
+  --accent: 211 91% 72%;
+  --accent-foreground: 232 30% 9%;
+  --border: 229 16% 19%;
+  --success: 153 54% 55%;
+  --destructive: 2 75% 68%;
 }
 
 body {
   background: hsl(var(--background));
   color: hsl(var(--foreground));
+  font-family: Inter, ui-sans-serif, system-ui, sans-serif;
+}
+
+.ambient-stage {
+  background:
+    radial-gradient(ellipse 55% 45% at 50% 30%, hsl(var(--accent) / 0.045), transparent 80%),
+    hsl(var(--background));
+}
+
+.glass-control {
+  position: relative;
+  border: 1px solid hsl(var(--foreground) / 0.09);
+  background:
+    linear-gradient(125deg, hsl(var(--foreground) / 0.07), transparent 42%),
+    linear-gradient(155deg, hsl(var(--surface) / 0.83), hsl(var(--surface) / 0.52));
+  box-shadow:
+    inset 0 1px 0 hsl(var(--foreground) / 0.11),
+    inset 0 -1px 0 hsl(var(--background) / 0.22),
+    0 18px 50px hsl(var(--background) / 0.45);
+  backdrop-filter: blur(26px) saturate(150%);
+  -webkit-backdrop-filter: blur(26px) saturate(150%);
+}
+
+@media (prefers-reduced-transparency: reduce) {
+  .glass-control {
+    background: hsl(var(--surface));
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+  }
 }
