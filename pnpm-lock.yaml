@@ -33,6 +33,9 @@ importers:
       '@eitri/config':
         specifier: workspace:*
         version: link:../../packages/config
+      '@next/env':
+        specifier: ^14.2.0
+        version: 14.2.35
       '@types/node':
         specifier: ^20.0.0
         version: 20.19.43
@@ -73,6 +76,9 @@ importers:
       '@eitri/config':
         specifier: workspace:*
         version: link:../../packages/config
+      '@next/env':
+        specifier: ^14.2.0
+        version: 14.2.35
       '@types/node':
         specifier: ^20.0.0
         version: 20.19.43
