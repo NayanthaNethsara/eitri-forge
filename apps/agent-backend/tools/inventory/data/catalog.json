@@ -1,0 +1,104 @@
+{
+  "shop_id": "demo-shop",
+  "currency": "USD",
+  "components": [
+    {
+      "sku": "CPU-AM4-6C",
+      "name": "Demo Ryzen-class 6-core AM4 CPU",
+      "price_minor": 11900,
+      "stock_quantity": 12,
+      "specs": {"category": "cpu", "socket": "AM4", "memory_type": "DDR4", "cores": 6, "tdp_watts": 65, "max_power_watts": 88}
+    },
+    {
+      "sku": "CPU-AM5-6C",
+      "name": "Demo Ryzen-class 6-core AM5 CPU",
+      "price_minor": 19900,
+      "stock_quantity": 8,
+      "specs": {"category": "cpu", "socket": "AM5", "memory_type": "DDR5", "cores": 6, "tdp_watts": 65, "max_power_watts": 88}
+    },
+    {
+      "sku": "MB-B550-MATX",
+      "name": "Demo B550 Micro-ATX DDR4 motherboard",
+      "price_minor": 9900,
+      "stock_quantity": 6,
+      "specs": {"category": "motherboard", "socket": "AM4", "memory_type": "DDR4", "form_factor": "Micro-ATX", "memory_slots": 4, "max_memory_gb": 128}
+    },
+    {
+      "sku": "MB-B650-ATX",
+      "name": "Demo B650 ATX DDR5 motherboard",
+      "price_minor": 16900,
+      "stock_quantity": 5,
+      "specs": {"category": "motherboard", "socket": "AM5", "memory_type": "DDR5", "form_factor": "ATX", "memory_slots": 4, "max_memory_gb": 128}
+    },
+    {
+      "sku": "RAM-DDR4-16",
+      "name": "Demo 16 GB DDR4-3200 kit (2 x 8 GB)",
+      "price_minor": 3900,
+      "stock_quantity": 20,
+      "specs": {"category": "ram", "memory_type": "DDR4", "capacity_gb": 16, "modules": 2, "speed_mt_s": 3200}
+    },
+    {
+      "sku": "RAM-DDR5-32",
+      "name": "Demo 32 GB DDR5-6000 kit (2 x 16 GB)",
+      "price_minor": 8900,
+      "stock_quantity": 14,
+      "specs": {"category": "ram", "memory_type": "DDR5", "capacity_gb": 32, "modules": 2, "speed_mt_s": 6000}
+    },
+    {
+      "sku": "GPU-8GB-115W",
+      "name": "Demo 8 GB dual-fan graphics card",
+      "price_minor": 28900,
+      "stock_quantity": 9,
+      "specs": {"category": "gpu", "vram_gb": 8, "power_watts": 115, "length_mm": 240, "recommended_psu_watts": 550}
+    },
+    {
+      "sku": "GPU-12GB-200W",
+      "name": "Demo 12 GB triple-fan graphics card",
+      "price_minor": 54900,
+      "stock_quantity": 0,
+      "specs": {"category": "gpu", "vram_gb": 12, "power_watts": 200, "length_mm": 300, "recommended_psu_watts": 650}
+    },
+    {
+      "sku": "PSU-550-BRONZE",
+      "name": "Demo 550 W ATX Bronze power supply",
+      "price_minor": 5900,
+      "stock_quantity": 11,
+      "specs": {"category": "psu", "wattage": 550, "form_factor": "ATX", "efficiency": "80 Plus Bronze"}
+    },
+    {
+      "sku": "PSU-750-GOLD",
+      "name": "Demo 750 W ATX Gold power supply",
+      "price_minor": 9900,
+      "stock_quantity": 7,
+      "specs": {"category": "psu", "wattage": 750, "form_factor": "ATX", "efficiency": "80 Plus Gold"}
+    },
+    {
+      "sku": "COOLER-120-TOWER",
+      "name": "Demo single-tower 120 mm air cooler",
+      "price_minor": 2900,
+      "stock_quantity": 16,
+      "specs": {"category": "cooler", "supported_sockets": ["AM4", "AM5", "LGA1700"], "cooling_capacity_watts": 150, "height_mm": 155}
+    },
+    {
+      "sku": "COOLER-DUAL-TOWER",
+      "name": "Demo dual-tower air cooler",
+      "price_minor": 5900,
+      "stock_quantity": 4,
+      "specs": {"category": "cooler", "supported_sockets": ["AM4", "AM5", "LGA1700"], "cooling_capacity_watts": 220, "height_mm": 160}
+    },
+    {
+      "sku": "CASE-MATX",
+      "name": "Demo Micro-ATX mesh case",
+      "price_minor": 5900,
+      "stock_quantity": 10,
+      "specs": {"category": "case", "supported_motherboard_form_factors": ["Micro-ATX", "Mini-ITX"], "supported_psu_form_factors": ["ATX"], "max_gpu_length_mm": 280, "max_cooler_height_mm": 158}
+    },
+    {
+      "sku": "CASE-ATX",
+      "name": "Demo ATX airflow mid-tower",
+      "price_minor": 8900,
+      "stock_quantity": 6,
+      "specs": {"category": "case", "supported_motherboard_form_factors": ["ATX", "Micro-ATX", "Mini-ITX"], "supported_psu_form_factors": ["ATX"], "max_gpu_length_mm": 360, "max_cooler_height_mm": 170}
+    }
+  ]
+}
