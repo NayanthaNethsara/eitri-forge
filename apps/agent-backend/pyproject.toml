@@ -19,13 +19,10 @@ dependencies = [
 ]
 
 [project.scripts]
-eitri-agent = "agent.__main__:main"
-
-[tool.setuptools]
-py-modules = ["main"]
+eitri-agent = "app.orchestrator.cli:main"
 
 [tool.setuptools.packages.find]
-include = ["tools*", "agent*", "core*"]
+include = ["app*"]
 
 [tool.setuptools.package-data]
-"tools.inventory" = ["data/*.json"]
+"app.inventory" = ["data/*.json"]

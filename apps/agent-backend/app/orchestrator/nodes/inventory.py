@@ -4,7 +4,7 @@ from langchain_core.messages import AIMessage, ToolMessage
 from langchain_core.tools import BaseTool
 from pydantic import BaseModel, ValidationError
 
-from agent.state import AgentState
+from app.orchestrator.state import AgentState
 
 
 async def execute_inventory_tools(

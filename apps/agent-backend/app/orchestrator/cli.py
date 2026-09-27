@@ -5,18 +5,14 @@ from google.auth.exceptions import GoogleAuthError
 from langchain_core.messages import HumanMessage
 from pydantic import ValidationError
 
-from agent.graph import create_agent
-from agent.llm.gemini import GeminiAdapter
-from core.config import ROOT_ENV_FILE, GeminiSettings, LoggingSettings
-from core.logging import configure_logging
-from tools.inventory.mock import MockInventoryProvider
-from tools.inventory.registry import create_inventory_tools
+from app.core.config import ROOT_ENV_FILE, GeminiSettings, LoggingSettings
+from app.core.logging import configure_logging
+from app.orchestrator.service import run_chat
 
 
 async def run_agent(prompt: str, settings: GeminiSettings) -> dict:
-    tools = create_inventory_tools(MockInventoryProvider.from_bundled_catalog())
-    agent = create_agent(GeminiAdapter(settings), tools)
-    return await agent.ainvoke({"messages": [HumanMessage(content=prompt)]})
+    reply, failed = await run_chat([HumanMessage(content=prompt)], settings)
+    return {"reply": reply, "error": failed}
 
 
 def main() -> None:
@@ -32,7 +28,7 @@ def main() -> None:
         result = asyncio.run(run_agent(arguments.prompt, settings))
     except (ValidationError, GoogleAuthError) as error:
         parser.error(str(error))
-    print(result["messages"][-1].text)
+    print(result["reply"])
     if result.get("error"):
         raise SystemExit(1)
 

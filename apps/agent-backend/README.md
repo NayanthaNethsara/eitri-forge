@@ -3,26 +3,27 @@
 The backend contains the FastAPI health service, a LangGraph agent, and internal inventory tools. Install Python 3.12 and uv, then run `make install-python` from the repository root to sync dependencies from `uv.lock`.
 
 ```text
-agent/
-  graph.py          Graph factory and routing
-  state.py          Message history, tool-round count, and error state
-  nodes/
-    model.py        Model invocation and system instructions
-    inventory.py    Internal tool execution and result messages
-  llm/
-    base.py         LLMAdapter interface and LLMError
-    gemini.py       Gemini Developer API and Vertex AI adapter
-  __main__.py       CLI composition of the model and demo shop
-core/
-  config.py         Validated settings loaded from the root environment
-  database.py       PostgreSQL async connection pool
-  logging.py        Application logger configuration and get_logger
-tools/inventory/
-  registry.py       query_components, get_component, and check_stock tools
-  models.py         Validated entities, queries, and results
-  provider.py       Async provider interface
-  mock.py           Shop-scoped mock provider
-  data/catalog.json Demo hardware catalog
+app/
+  main.py           FastAPI app and database lifespan
+  api/
+    schemas.py      Chat request and response models
+    routes/          Chat, health, and readiness handlers
+  core/
+    config.py       Validated settings loaded from the root environment
+    database.py     PostgreSQL async connection pool
+    logging.py      Application logger configuration and get_logger
+  inventory/
+    models.py       Validated parts, queries, and results
+    repository.py   Shop-scoped JSON repository
+    tools.py        Internal inventory tools
+    data/catalog.json  Demo hardware catalog
+  orchestrator/
+    service.py      Agent composition for chat requests
+    graph.py        LangGraph wiring
+    state.py        Agent state
+    cli.py          Agent CLI
+    nodes/          Model and inventory execution
+    llm/            LLM adapter and Gemini implementation
 ```
 
 ## LangGraph agent
@@ -48,7 +49,7 @@ Set these values in the repository root `.env`:
 | `GOOGLE_API_KEY` | Gemini Developer API key; required for `gemini` |
 | `GOOGLE_CLOUD_PROJECT` | Google Cloud project; required for `vertex` |
 | `GOOGLE_CLOUD_LOCATION` | Vertex AI location; defaults to `global` |
-| `EITRI_LLM_MODEL` | Gemini model ID; the example uses `gemini-2.5-flash` |
+| `EITRI_LLM_MODEL` | Gemini model ID; the example uses `gemini-3.5-flash-lite` |
 | `LOG_LEVEL` | `DEBUG`, `INFO`, `WARNING`, `ERROR`, or `CRITICAL`; defaults to `INFO` |
 
 For Vertex AI, use Google Application Default Credentials with permission to invoke the model. Deployments can use workload identity or `GOOGLE_APPLICATION_CREDENTIALS` pointing to a credential file outside this repository.
@@ -64,13 +65,13 @@ For in-process use inside an async function:
 ```python
 from langchain_core.messages import HumanMessage
 
-from agent.graph import create_agent
-from agent.llm.gemini import GeminiAdapter
-from core.config import GeminiSettings
-from tools.inventory.mock import MockInventoryProvider
-from tools.inventory.registry import create_inventory_tools
+from app.core.config import GeminiSettings
+from app.inventory.repository import InventoryRepository
+from app.inventory.tools import create_inventory_tools
+from app.orchestrator.graph import create_agent
+from app.orchestrator.llm.gemini import GeminiAdapter
 
-tools = create_inventory_tools(MockInventoryProvider.from_bundled_catalog())
+tools = create_inventory_tools(InventoryRepository.from_bundled_catalog())
 llm = GeminiAdapter(GeminiSettings())
 agent = create_agent(llm, tools)
 result = await agent.ainvoke({"messages": [HumanMessage(content="Find DDR5 RAM.")]})
@@ -79,7 +80,7 @@ print(result["messages"][-1].text)
 
 ## Internal tools
 
-`create_inventory_tools(provider)` returns three asynchronous LangChain tools. They run directly in the agent process and each receives a validated `query` object. Tool schemas and descriptions are passed to the model automatically.
+`create_inventory_tools(repository)` returns three asynchronous LangChain tools. They run directly in the agent process and each receives a validated `query` object. Tool schemas and descriptions are passed to the model automatically.
 
 Search with `query_components`:
 
@@ -95,19 +96,19 @@ Use an exact returned SKU with `get_component` or `check_stock`:
 {"query": {"sku": "CPU-AM5-6C"}}
 ```
 
-Details return `component=null` for unknown SKUs. Stock returns `quantity=null` for unknown SKUs and `quantity=0` for known but unavailable parts. `checked_at` is the lookup time in UTC. Every call reaches the provider, and stock checks do not reserve inventory.
+Details return `component=null` for unknown SKUs. Stock returns `quantity=null` for unknown SKUs and `quantity=0` for known but unavailable parts. `checked_at` is the lookup time in UTC. Every call reaches the repository, and stock checks do not reserve inventory.
 
 ## Provider boundary and sample data
 
-`InventoryProvider` defines asynchronous search, detail, and stock operations using Pydantic queries and results. Bind a provider to trusted shop configuration before constructing its tools. The model cannot select a tenant through tool arguments. Replace the mock with an HTTP or local bridge adapter implementing this interface to query live inventory without changing the graph or tool names. Tenant authentication belongs in the hosting application.
+`InventoryRepository` implements asynchronous search, detail, and stock operations against the bundled JSON catalog using Pydantic queries and results. The model cannot select a tenant through tool arguments. When a live shop integration is needed, this repository can be changed to query a database, HTTP API, or local bridge without changing the tool names or graph. Tenant authentication belongs in the hosting application.
 
-The bundled JSON has 14 fictional products with realistic specification ranges, illustrative USD prices, AM4/DDR4 and AM5/DDR5 build paths, and an unavailable GPU. It loads once per mock provider instance. Prices are integer minor currency units; one catalog uses one currency. Models reject extra fields, negative quantities, malformed specs, and duplicate SKUs. Catalog objects are immutable.
+The bundled JSON has 14 fictional products with realistic specification ranges, illustrative USD prices, AM4/DDR4 and AM5/DDR5 build paths, and an unavailable GPU. It loads once per JSON repository instance. Prices are integer minor currency units; one catalog uses one currency. Models reject extra fields, negative quantities, malformed specs, and duplicate SKUs. Catalog objects are immutable.
 
 The catalog includes sockets, DDR generations, RAM capacity and module counts, CPU TDP and maximum power, GPU power and length, PSU output, and cooler/case clearances. Cooler wattage ratings are illustrative. Matching these fields does not prove BIOS, memory QVL, connector, or complete build compatibility. Model answers are not compatibility certifications.
 
 ## Running the service
 
-`make dev-agent` runs the FastAPI service with `/health` and `/ready` endpoints on port 8000.
+`make dev-agent` runs the FastAPI service with `/health`, `/ready`, and `/chat` endpoints on port 8000. The web app calls `/chat` through its own `/api/chat` route. Each request accepts up to 20 user and assistant messages and uses the bundled sample inventory.
 
 ## PostgreSQL and containers
 

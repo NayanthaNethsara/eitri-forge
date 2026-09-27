@@ -3,9 +3,9 @@ from collections.abc import Sequence
 from langchain_core.messages import AIMessage, BaseMessage
 from langchain_core.utils.json_schema import dereference_refs
 from langchain_google_genai import ChatGoogleGenerativeAI
-from agent.llm.base import LLMAdapter, LLMError
-from core.config import GeminiSettings
-from core.logging import get_logger
+from app.core.config import GeminiSettings
+from app.core.logging import get_logger
+from app.orchestrator.llm.base import LLMAdapter, LLMError
 
 
 logger = get_logger("llm.gemini")

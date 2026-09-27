@@ -1,7 +1,7 @@
 from psycopg.conninfo import make_conninfo
 from psycopg_pool import AsyncConnectionPool
 
-from core.config import DatabaseSettings
+from app.core.config import DatabaseSettings
 
 
 def create_database_pool(settings: DatabaseSettings) -> AsyncConnectionPool:

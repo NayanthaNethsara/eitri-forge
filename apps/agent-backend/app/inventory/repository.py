@@ -1,7 +1,7 @@
 from datetime import datetime, timezone
 from importlib.resources import files
 
-from tools.inventory.models import (
+from app.inventory.models import (
     CaseSpecs,
     Catalog,
     Component,
@@ -19,14 +19,14 @@ from tools.inventory.models import (
 )
 
 
-class MockInventoryProvider:
+class InventoryRepository:
     def __init__(self, catalog: Catalog) -> None:
         self._catalog = catalog
         self._components = {component.sku: component for component in catalog.components}
 
     @classmethod
-    def from_bundled_catalog(cls) -> "MockInventoryProvider":
-        data = files("tools.inventory").joinpath("data/catalog.json").read_text(encoding="utf-8")
+    def from_bundled_catalog(cls) -> "InventoryRepository":
+        data = files("app.inventory").joinpath("data/catalog.json").read_text(encoding="utf-8")
         return cls(Catalog.model_validate_json(data))
 
     async def query_components(self, query: InventoryQuery) -> SearchResult:

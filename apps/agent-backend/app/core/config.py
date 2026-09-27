@@ -5,7 +5,7 @@ from pydantic import Field, SecretStr, model_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
-ROOT_ENV_FILE = Path(__file__).resolve().parents[3] / ".env"
+ROOT_ENV_FILE = Path(__file__).resolve().parents[4] / ".env"
 
 
 class EnvironmentSettings(BaseSettings):

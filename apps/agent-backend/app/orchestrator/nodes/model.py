@@ -2,8 +2,8 @@ from typing import Literal
 
 from langchain_core.messages import AIMessage, SystemMessage
 
-from agent.llm.base import LLMAdapter, LLMError
-from agent.state import AgentState
+from app.orchestrator.llm.base import LLMAdapter, LLMError
+from app.orchestrator.state import AgentState
 
 
 SYSTEM_PROMPT = (

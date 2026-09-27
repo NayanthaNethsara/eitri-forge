@@ -1,6 +1,6 @@
 from langchain_core.tools import BaseTool, tool
 
-from tools.inventory.models import (
+from app.inventory.models import (
     ComponentLookup,
     DetailResult,
     InventoryQuery,
@@ -8,7 +8,7 @@ from tools.inventory.models import (
     SearchResult,
     StockResult,
 )
-from tools.inventory.provider import InventoryProvider
+from app.inventory.repository import InventoryRepository
 
 
 class SearchArguments(InventoryModel):
@@ -19,7 +19,7 @@ class LookupArguments(InventoryModel):
     query: ComponentLookup
 
 
-def create_inventory_tools(provider: InventoryProvider) -> list[BaseTool]:
+def create_inventory_tools(repository: InventoryRepository) -> list[BaseTool]:
 
     @tool(args_schema=SearchArguments)
     async def query_components(query: InventoryQuery) -> SearchResult:
@@ -31,7 +31,7 @@ def create_inventory_tools(provider: InventoryProvider) -> list[BaseTool]:
         Prices use the returned currency's minor units. Matching filters alone do
         not establish complete build compatibility.
         """
-        return await provider.query_components(query)
+        return await repository.query_components(query)
 
     @tool(args_schema=LookupArguments)
     async def get_component(query: ComponentLookup) -> DetailResult:
@@ -41,7 +41,7 @@ def create_inventory_tools(provider: InventoryProvider) -> list[BaseTool]:
         applicable. An unknown SKU returns component=null. These are catalog specs,
         not measured benchmarks or a guarantee of whole-build compatibility.
         """
-        return await provider.get_component(query)
+        return await repository.get_component(query)
 
     @tool(args_schema=LookupArguments)
     async def check_stock(query: ComponentLookup) -> StockResult:
@@ -51,6 +51,6 @@ def create_inventory_tools(provider: InventoryProvider) -> list[BaseTool]:
         checked_at is the lookup time in UTC. The mock provider returns its sample
         stock; a live provider queries the shop on each invocation.
         """
-        return await provider.check_stock(query)
+        return await repository.check_stock(query)
 
     return [query_components, get_component, check_stock]

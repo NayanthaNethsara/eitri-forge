@@ -4,10 +4,10 @@ from langchain_core.tools import BaseTool
 from langgraph.graph import END, START, StateGraph
 from langgraph.graph.state import CompiledStateGraph
 
-from agent.llm.base import LLMAdapter
-from agent.nodes.inventory import execute_inventory_tools
-from agent.nodes.model import call_model, route_model_response
-from agent.state import AgentState
+from app.orchestrator.llm.base import LLMAdapter
+from app.orchestrator.nodes.inventory import execute_inventory_tools
+from app.orchestrator.nodes.model import call_model, route_model_response
+from app.orchestrator.state import AgentState
 
 
 def create_agent(
