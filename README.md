@@ -53,11 +53,13 @@ make db-up
 
 Run `make dev` for the customer app on port 3000 and admin app on port 3001. Individual frontend commands are `make dev-web` and `make dev-admin`. Both expose `/api/health`. Use `make compose-up` for the containerized backend, or `make dev-agent` in another terminal for local FastAPI on port 8000. Stop the backend container before starting local FastAPI on the same port.
 
+The customer app opens an Eitri chat at `http://localhost:3000`. Set `GOOGLE_API_KEY` in the root `.env`, start the backend with `make compose-up`, then run `make dev-web`. The web app forwards chat requests to `AGENT_BACKEND_URL` (default `http://127.0.0.1:8000`). The chat currently uses the bundled sample inventory.
+
 Use `make typecheck` and `make build` for checks. The backend declares dependencies in `pyproject.toml` and pins them in `uv.lock`. After changing dependencies, run `make lock-python` and `make install-python`.
 
 ## LangGraph agent and inventory
 
-The agent uses Gemini through an LLM adapter. Internal inventory tools live under `apps/agent-backend/tools/inventory` and execute inside the agent process.
+The agent uses Gemini through an LLM adapter. The backend lives in `apps/agent-backend/app`: `orchestrator` contains the LangGraph agent, `inventory` contains the models, JSON repository, and internal tools, and `api` contains the HTTP routes.
 
 Set `GOOGLE_API_KEY` in the root `.env` and run:
 

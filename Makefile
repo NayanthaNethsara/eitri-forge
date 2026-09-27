@@ -24,7 +24,7 @@ dev-admin:
 	$(PNPM) --filter @eitri/admin dev
 
 dev-agent: env
-	apps/agent-backend/.venv/bin/python -m uvicorn main:app --app-dir apps/agent-backend --reload --port 8000
+	apps/agent-backend/.venv/bin/python -m uvicorn app.main:app --app-dir apps/agent-backend --reload --port 8000
 
 build:
 	$(PNPM) build
