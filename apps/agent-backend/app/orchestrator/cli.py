@@ -8,11 +8,11 @@ from pydantic import ValidationError
 from app.core.config import ROOT_ENV_FILE, GeminiSettings, LoggingSettings
 from app.core.logging import configure_logging
 from app.orchestrator.service import run_chat
+from app.orchestrator.result import AgentResult
 
 
-async def run_agent(prompt: str, settings: GeminiSettings) -> dict:
-    reply, failed = await run_chat([HumanMessage(content=prompt)], settings)
-    return {"reply": reply, "error": failed}
+async def run_agent(prompt: str, settings: GeminiSettings) -> AgentResult:
+    return await run_chat([HumanMessage(content=prompt)], settings)
 
 
 def main() -> None:
@@ -28,8 +28,8 @@ def main() -> None:
         result = asyncio.run(run_agent(arguments.prompt, settings))
     except (ValidationError, GoogleAuthError) as error:
         parser.error(str(error))
-    print(result["reply"])
-    if result.get("error"):
+    print(result.response.reply)
+    if result.error:
         raise SystemExit(1)
 
 

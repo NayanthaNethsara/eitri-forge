@@ -1,28 +1,32 @@
 import json
+from typing import Any, Literal
 
-from langchain_core.messages import AIMessage, ToolMessage
+from langchain_core.messages import AIMessage, BaseMessage, ToolMessage
 from langchain_core.tools import BaseTool
 from pydantic import BaseModel, ValidationError
 
-from app.orchestrator.state import AgentState
+from app.orchestrator.state import AgentState, NodeUpdate
 
 
 async def execute_inventory_tools(
     state: AgentState, *, tools: dict[str, BaseTool], max_tool_rounds: int
-) -> dict:
-    calls = state["messages"][-1].tool_calls
+) -> NodeUpdate:
+    message = state["messages"][-1]
+    if not isinstance(message, AIMessage) or not message.tool_calls:
+        return {"error": "No inventory calls were provided."}
+    calls = message.tool_calls
     rounds = state.get("tool_rounds", 0)
     if rounds >= max_tool_rounds:
         error = "The inventory lookup limit was reached. Please narrow your request."
-        messages = [
+        error_messages = [
             ToolMessage(content=error, tool_call_id=call["id"], status="error")
             for call in calls
         ]
         return {
-            "messages": [*messages, AIMessage(content=error)],
+            "messages": [*error_messages, AIMessage(content=error)],
             "error": error,
         }
-    messages = []
+    messages: list[BaseMessage] = []
     for call in calls:
         content, failed = await invoke_inventory_tool(tools, call["name"], call["args"])
         messages.append(
@@ -37,7 +41,7 @@ async def execute_inventory_tools(
 
 
 async def invoke_inventory_tool(
-    tools: dict[str, BaseTool], name: str, arguments: dict
+    tools: dict[str, BaseTool], name: str, arguments: dict[str, Any]
 ) -> tuple[str, bool]:
     if name not in tools:
         return "Unknown inventory tool. Use one of the provided tool names.", True
@@ -51,3 +55,7 @@ async def invoke_inventory_tool(
     if not isinstance(result, BaseModel):
         return "Inventory tool returned an invalid response.", True
     return result.model_dump_json(), False
+
+
+def route_inventory_result(state: AgentState) -> Literal["model", "final_answer"]:
+    return "final_answer" if state.get("error") else "model"

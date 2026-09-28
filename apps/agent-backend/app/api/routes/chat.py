@@ -26,7 +26,7 @@ async def chat(payload: ChatRequest) -> ChatResponse | JSONResponse:
         HumanMessage(content=message.content) if message.role == "user" else AIMessage(content=message.content)
         for message in payload.messages
     ]
-    reply, failed = await run_chat(messages, settings)
-    if failed:
-        return JSONResponse({"detail": reply}, status_code=503)
-    return ChatResponse(reply=reply)
+    result = await run_chat(messages, settings)
+    if result.error:
+        return JSONResponse({"detail": result.error}, status_code=503)
+    return result.response

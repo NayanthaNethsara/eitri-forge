@@ -5,7 +5,7 @@ from langchain_core.utils.json_schema import dereference_refs
 from langchain_google_genai import ChatGoogleGenerativeAI
 from app.core.config import GeminiSettings
 from app.core.logging import get_logger
-from app.orchestrator.llm.base import LLMAdapter, LLMError
+from app.orchestrator.llm.base import LLMAdapter, LLMError, ToolDefinition
 
 
 logger = get_logger("llm.gemini")
@@ -26,7 +26,7 @@ class GeminiAdapter(LLMAdapter):
         )
 
     async def generate(
-        self, messages: Sequence[BaseMessage], tools: list[dict]
+        self, messages: Sequence[BaseMessage], tools: list[ToolDefinition]
     ) -> AIMessage:
         definitions = []
         for tool in tools:

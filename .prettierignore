@@ -1,0 +1,13 @@
+**/node_modules/
+**/.next/
+**/.turbo/
+**/dist/
+**/.venv/
+**/next-env.d.ts
+**/agent.md
+**/AGENTS.md
+pnpm-lock.yaml
+uv.lock
+.env
+.env.*
+apps/agent-backend/

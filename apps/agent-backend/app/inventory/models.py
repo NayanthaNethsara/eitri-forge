@@ -1,7 +1,7 @@
 from datetime import datetime
 from typing import Annotated, Literal, Self
 
-from pydantic import BaseModel, ConfigDict, Field, model_validator
+from pydantic import BaseModel, ConfigDict, Field, HttpUrl, model_validator
 
 
 Category = Literal["cpu", "motherboard", "ram", "gpu", "psu", "cooler", "case"]
@@ -91,6 +91,12 @@ class Component(InventoryModel):
     price_minor: NonNegativeInteger = Field(description="Unit price in the catalog currency's minor units; USD cents.")
     stock_quantity: NonNegativeInteger
     specs: HardwareSpecs
+    image_url: HttpUrl | None = None
+
+
+class InventoryProduct(Component):
+    shop_id: Identifier
+    currency: Annotated[str, Field(pattern=r"^[A-Z]{3}$")]
 
 
 class Catalog(InventoryModel):

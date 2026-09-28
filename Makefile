@@ -1,4 +1,4 @@
-.PHONY: env install install-python lock-python dev dev-web dev-admin dev-agent build typecheck compose-up compose-down compose-logs db-up
+.PHONY: env install install-python lock-python dev dev-web dev-admin dev-agent build typecheck compose-up compose-down compose-logs db-up lint format format-check
 
 PNPM ?= pnpm
 
@@ -43,3 +43,12 @@ compose-logs:
 
 db-up: env
 	docker compose up --detach --wait postgres
+
+lint:
+	$(PNPM) lint
+
+format:
+	$(PNPM) format
+
+format-check:
+	$(PNPM) format:check

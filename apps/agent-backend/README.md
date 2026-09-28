@@ -20,15 +20,19 @@ app/
   orchestrator/
     service.py      Agent composition for chat requests
     graph.py        LangGraph wiring
-    state.py        Agent state
+    state.py        Agent state and typed node updates
+    prompts.py      Central system prompt used by the model node
+    result.py       AssistantResponse, AgentResult, and validated product extraction
     cli.py          Agent CLI
-    nodes/          Model and inventory execution
+    nodes/          Model, inventory execution, and final answer
     llm/            LLM adapter and Gemini implementation
 ```
 
 ## LangGraph agent
 
-The graph runs `START → model → inventory → model → END`. The model receives tool schemas and decides whether to request inventory or answer directly. Tool results return to the model in messages with matching call IDs. Invalid tool arguments become error messages the model can correct. At most three tool rounds execute per invocation; repeated requests terminate with a clear limit message. Model failures become a safe final response.
+The graph starts at `model`, loops through `inventory` when tools are requested, and always ends through `final_answer → END`. The model receives typed tool definitions and decides whether to request inventory or answer directly. Tool results return to the model in messages with matching call IDs. Invalid tool arguments become error messages the model can correct. At most three tool rounds execute per invocation; repeated requests terminate with a clear limit message.
+
+The final answer node constructs `AgentResult(response=AssistantResponse(reply, products), error)`. It validates a nonempty answer, gathers products from validated tool results, and omits products on terminal failures. It makes no additional model call. `run_chat` returns this result directly; the API returns its `response` on success or a 503 with `detail` on failure. The CLI prints `response.reply` and uses `error` for its exit status. The public chat payload stays `{ "reply": "...", "products": [] }`.
 
 `create_agent(llm, tools)` receives an `LLMAdapter` and the shop's internal tools. Nodes do not select model providers, read credentials, or choose shops. To supply another model, implement `LLMAdapter.generate(messages, tools)` and return an `AIMessage` including any tool calls. Translate provider failures into `LLMError`.
 
@@ -75,7 +79,7 @@ tools = create_inventory_tools(InventoryRepository.from_bundled_catalog())
 llm = GeminiAdapter(GeminiSettings())
 agent = create_agent(llm, tools)
 result = await agent.ainvoke({"messages": [HumanMessage(content="Find DDR5 RAM.")]})
-print(result["messages"][-1].text)
+print(result["result"].response.reply)
 ```
 
 ## Internal tools

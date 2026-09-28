@@ -2,6 +2,8 @@ from typing import Literal
 
 from pydantic import BaseModel, ConfigDict, Field
 
+from app.orchestrator.result import AssistantResponse
+
 
 class ChatMessage(BaseModel):
     model_config = ConfigDict(extra="forbid")
@@ -14,5 +16,4 @@ class ChatRequest(BaseModel):
     messages: list[ChatMessage] = Field(min_length=1, max_length=20)
 
 
-class ChatResponse(BaseModel):
-    reply: str
+ChatResponse = AssistantResponse
