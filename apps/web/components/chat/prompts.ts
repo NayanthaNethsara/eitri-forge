@@ -1,12 +1,5 @@
+import type { StarterPrompt } from "@/types/chat";
 import { Cpu, Layers3, PackageSearch, Wrench } from "lucide-react";
-import type { LucideIcon } from "lucide-react";
-
-export type StarterPrompt = {
-  icon: LucideIcon;
-  label: string;
-  command: string;
-  prompt: string;
-};
 
 export const starterPrompts: StarterPrompt[] = [
   {

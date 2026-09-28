@@ -1,19 +1,13 @@
 "use client";
 
-import { AnimatePresence, motion } from "framer-motion";
-import { ArrowUp, Command } from "lucide-react";
-import { useEffect, useState } from "react";
-import type { KeyboardEvent, RefObject } from "react";
-import { starterPrompts } from "./prompts";
+import type { ChatComposerProps } from "@/types/chat";
 
-type ChatComposerProps = {
-  draft: string;
-  isSending: boolean;
-  textareaRef: RefObject<HTMLTextAreaElement>;
-  onDraftChange: (draft: string) => void;
-  onSelectPrompt: (prompt: string) => void;
-  onSend: () => void;
-};
+import { AnimatePresence, motion } from "framer-motion";
+import { ArrowUp, Command, Square } from "lucide-react";
+import { useEffect, useState } from "react";
+import type { KeyboardEvent } from "react";
+import { MESSAGE_LENGTH_LIMIT } from "@/lib/constants";
+import { starterPrompts } from "./prompts";
 
 export function ChatComposer({
   draft,
@@ -22,12 +16,14 @@ export function ChatComposer({
   onDraftChange,
   onSelectPrompt,
   onSend,
+  onStop,
 }: ChatComposerProps) {
   const [activeCommand, setActiveCommand] = useState(0);
   const [commandsDismissed, setCommandsDismissed] = useState(false);
-  const commandMatches = !commandsDismissed && draft.startsWith("/") && !draft.includes(" ")
-    ? starterPrompts.filter(({ command }) => command.startsWith(draft.toLowerCase()))
-    : [];
+  const commandMatches =
+    !commandsDismissed && draft.startsWith("/") && !draft.includes(" ")
+      ? starterPrompts.filter(({ command }) => command.startsWith(draft.toLowerCase()))
+      : [];
 
   useEffect(() => {
     const textarea = textareaRef.current;
@@ -43,6 +39,7 @@ export function ChatComposer({
   }
 
   function handleKeyDown(event: KeyboardEvent<HTMLTextAreaElement>) {
+    if (event.nativeEvent.isComposing) return;
     if (commandMatches.length > 0) {
       if (event.key === "ArrowDown") {
         event.preventDefault();
@@ -79,7 +76,7 @@ export function ChatComposer({
         event.preventDefault();
         onSend();
       }}
-      className="glass-control rounded-[26px] p-3 transition-colors focus-within:border-accent/35 sm:p-4"
+      className="glass-control relative rounded-[26px] p-3 transition-colors focus-within:border-accent/35 sm:p-4"
     >
       <AnimatePresence>
         {commandMatches.length > 0 && (
@@ -112,7 +109,9 @@ export function ChatComposer({
         )}
       </AnimatePresence>
 
-      <label htmlFor="chat-message" className="sr-only">Message Eitri</label>
+      <label htmlFor="chat-message" className="sr-only">
+        Message Eitri
+      </label>
       <textarea
         ref={textareaRef}
         id="chat-message"
@@ -121,8 +120,7 @@ export function ChatComposer({
         onKeyDown={handleKeyDown}
         placeholder="Ask about your next build..."
         rows={2}
-        maxLength={4000}
-        disabled={isSending}
+        maxLength={MESSAGE_LENGTH_LIMIT}
         className="max-h-44 min-h-16 w-full resize-none bg-transparent px-2 py-2 text-sm leading-relaxed text-foreground outline-none placeholder:text-muted/70 disabled:opacity-60"
       />
       <div className="flex items-center justify-between gap-3 border-t border-border/50 px-1 pt-3">
@@ -139,13 +137,24 @@ export function ChatComposer({
           <Command aria-hidden="true" className="h-4 w-4" />
           <span>Prompts</span>
         </button>
-        <button
-          type="submit"
-          disabled={!draft.trim() || isSending}
-          className="inline-flex h-9 items-center gap-2 rounded-full border border-foreground/20 bg-accent px-4 text-sm font-semibold text-accent-foreground shadow-[inset_0_1px_0_hsl(var(--foreground)/0.3)] transition-colors hover:bg-accent/85 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent disabled:cursor-not-allowed disabled:opacity-40"
-        >
-          Send <ArrowUp aria-hidden="true" className="h-4 w-4" />
-        </button>
+        {isSending ? (
+          <button
+            type="button"
+            onClick={onStop}
+            className="inline-flex h-9 items-center gap-2 rounded-full bg-foreground px-4 text-xs font-medium text-background"
+          >
+            <Square className="h-3 w-3" />
+            Stop
+          </button>
+        ) : (
+          <button
+            type="submit"
+            disabled={!draft.trim() || isSending}
+            className="inline-flex h-9 items-center gap-2 rounded-full border border-foreground/20 bg-accent px-4 text-sm font-semibold text-accent-foreground shadow-[inset_0_1px_0_hsl(var(--foreground)/0.3)] transition-colors hover:bg-accent/85 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent disabled:cursor-not-allowed disabled:opacity-40"
+          >
+            Send <ArrowUp aria-hidden="true" className="h-4 w-4" />
+          </button>
+        )}
       </div>
     </form>
   );
